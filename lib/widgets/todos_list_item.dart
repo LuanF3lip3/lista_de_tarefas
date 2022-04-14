@@ -19,7 +19,7 @@ class TodosListItem extends StatelessWidget {
     children: [
         SlidableAction(
         spacing: 7,
-        onPressed: onDelete(todo) ,
+        onPressed: (_) => onDelete(todo),
         backgroundColor: Color.fromARGB(255, 248, 6, 6),
         foregroundColor: Colors.white,
         icon: Icons.delete,

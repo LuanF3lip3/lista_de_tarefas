@@ -9,18 +9,20 @@ class ToDoListPage extends StatefulWidget {
   State<ToDoListPage> createState() => _ToDoListPageState();
 }
 
-final TextEditingController toDoController = TextEditingController();
-List<Todo> ToDos = [];
-bool textIsEnpty = false;
-
-
 class _ToDoListPageState extends State<ToDoListPage> {
+
+  final TextEditingController toDoController = TextEditingController();
+  List<Todo> toDos = [];
+  String textField = "";
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(child: 
      Scaffold(
       body: Center(
-        child:Expanded(
+        child:Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
           child: Padding(
             padding: EdgeInsets.all(15),
             child: Column(
@@ -29,7 +31,11 @@ class _ToDoListPageState extends State<ToDoListPage> {
               style: TextStyle(fontSize: 30),),
                 Row(children:[ Expanded(
                  child:TextField(
-
+                    onChanged: (value) {
+                      setState(() {
+                        textField = value;
+                      });
+                    },
                    controller: toDoController,
                 decoration: InputDecoration(
                border: OutlineInputBorder(),
@@ -39,12 +45,11 @@ class _ToDoListPageState extends State<ToDoListPage> {
             ), 
           ),
           SizedBox(width: 10,),
-        ElevatedButton(onPressed: (){
-          String text = toDoController.text;
-          textIsEnpty ? null :
+        ElevatedButton(onPressed: textField.isEmpty ? null : (){
           setState(() {
-            Todo newtodo = Todo(title: text, dateTime: DateTime.now(),);
-          ToDos.add(newtodo);
+            Todo newtodo = Todo(title: toDoController.text, dateTime: DateTime.now(),);
+            toDos.add(newtodo);
+            textField = "";
           });
           toDoController.clear();
         }, 
@@ -64,10 +69,8 @@ class _ToDoListPageState extends State<ToDoListPage> {
             child:ListView(
             shrinkWrap: true,
             children: [
-              for (Todo toDo in ToDos)
-              TodosListItem(todo: toDo,
-              onDelete: onDelete,
-              ),
+              for (Todo toDo in toDos)
+                TodosListItem(todo: toDo, onDelete: onDelete,),
           SizedBox(height: 18,)
              ] 
             )
@@ -75,7 +78,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
           Row(
             children: [
               Expanded(
-                child:Text('Voce nao tem ${ToDos.length} tarefas pendentes'),
+                child:Text('Voce nao tem ${toDos.length} tarefas pendentes'),
               ),
             ElevatedButton(onPressed: 
               showDeleteTodosConfimationDialog, 
@@ -107,7 +110,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
       content: Text('!!!!CUIDADO!!!!'),
       actions: [TextButton(onPressed: (() {
         setState(() {
-        ToDos.clear();
+        toDos.clear();
         });
       Navigator.of(context).pop();
       }),
@@ -126,7 +129,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
 
    void onDelete(Todo todo) {
       setState(() {
-      ToDos.remove(todo);
+        toDos.remove(todo);
       });
     }
     
