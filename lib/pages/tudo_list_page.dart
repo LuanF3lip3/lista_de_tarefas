@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tarefas/models/tudo.dart';
+import 'package:tarefas/repositories/todo_repositories.dart';
 import 'package:tarefas/widgets/todos_list_item.dart';
 
 class ToDoListPage extends StatefulWidget {
@@ -14,6 +15,20 @@ class _ToDoListPageState extends State<ToDoListPage> {
   final TextEditingController toDoController = TextEditingController();
   List<Todo> toDos = [];
   String textField = "";
+  final TodoRepository todoRepository = TodoRepository();
+  Todo? deletedTodo;
+  int? deletedTodoPos;
+
+  @override
+  void initState() {
+    super.initState();
+
+    todoRepository.getTodoList().then((value) {
+      setState(() {
+      toDos = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +41,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
           child: Padding(
             padding: EdgeInsets.all(15),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [ Text('Lista de Tarefas',
               style: TextStyle(fontSize: 30),),
@@ -52,6 +68,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
             textField = "";
           });
           toDoController.clear();
+          todoRepository.saveTodoList(toDos);
         }, 
         child: Icon(Icons.add,
         size: 35,
@@ -128,9 +145,29 @@ class _ToDoListPageState extends State<ToDoListPage> {
 
 
    void onDelete(Todo todo) {
+      deletedTodo = todo;
+      deletedTodoPos = toDos.indexOf(todo);
       setState(() {
         toDos.remove(todo);
       });
+      todoRepository.saveTodoList(toDos);
+
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${todo.title} deletado(a) com sucesso!!!!',
+        style: TextStyle(color: Color(0xff00FF3E),
+        ),
+        ),
+        duration: Duration(seconds: 5), 
+        action: SnackBarAction(label: "Desfazer",
+        onPressed: (){
+          setState(() {
+          toDos.insert(deletedTodoPos!, deletedTodo!);
+          });
+        },
+        ),
+        ),
+      );
     }
     
 }
