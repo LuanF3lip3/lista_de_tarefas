@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tarefas/models/tudo.dart';
-
-const todoListKey = 'todo_list';
+import 'package:tarefas/utils/constants.dart';
 
 class TodoRepository {
 
@@ -21,7 +20,7 @@ late SharedPreferences sharedPreferences;
   Future<List<Todo>> getTodoList() async{
 
     sharedPreferences = await SharedPreferences.getInstance();
-    final String jsonString = sharedPreferences.getString(todoListKey)?? '[]';
+    final String jsonString = sharedPreferences.getString(Constants.TODOLISTKEY)?? '[]';
     final List jsonDecoded = jsonDecode(jsonString) as List;
     return jsonDecoded.map((e) => Todo.fronJson(e)).toList();
   }
@@ -29,7 +28,7 @@ late SharedPreferences sharedPreferences;
   void saveTodoList(List<Todo> todos) {
   final String jsonString = json.encode(todos);
   print(jsonString);
-  sharedPreferences.setString('todo_list', jsonString);
+  sharedPreferences.setString(Constants.TODOLISTKEY, jsonString);
 
 }
 
